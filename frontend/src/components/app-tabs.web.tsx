@@ -33,7 +33,7 @@ export default function AppTabs() {
   );
 }
 
-export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps) {
+export function TabButton({ children, isFocused, ref: _ref, ...props }: TabTriggerSlotProps) {
   return (
     <Pressable {...props} style={({ pressed }) => pressed && styles.pressed}>
       <ThemedView
@@ -55,14 +55,14 @@ export function CustomTabList(props: TabListProps) {
     <View {...props} style={styles.tabListContainer}>
       <ThemedView type="backgroundElement" style={styles.innerContainer}>
         <ThemedText type="smallBold" style={styles.brandText}>
-          Expo Starter
+          Derma Check
         </ThemedText>
 
         {props.children}
 
-        <ExternalLink href="https://docs.expo.dev" asChild>
+        <ExternalLink href="https://www.gov.br/saude/pt-br" asChild>
           <Pressable style={styles.externalPressable}>
-            <ThemedText type="link">Docs</ThemedText>
+            <ThemedText type="link">Saúde</ThemedText>
             <SymbolView
               tintColor={colors.text}
               name={{ ios: 'arrow.up.right.square', web: 'link' }}
