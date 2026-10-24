@@ -1,19 +1,23 @@
+import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import express from 'express';
+import authRoutes from './routes/authRoutes';
 
 dotenv.config();
 
 const app = express();
-const port = Number(process.env.PORT ?? 3000);
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-app.get('/health', (_req, res) => {
-  res.status(200).json({ status: 'ok', service: 'derma-check-api' });
+// Rotas públicas de Autenticação
+app.use('/api/auth', authRoutes);
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', message: 'API Derma-check online' });
 });
 
-app.listen(port, () => {
-  console.log(`Derma Check API running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Servidor Derma-check rodando na porta ${PORT}`);
 });
