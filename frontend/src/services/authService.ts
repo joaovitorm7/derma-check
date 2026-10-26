@@ -1,4 +1,3 @@
-
 import * as SecureStore from 'expo-secure-store';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -20,10 +19,24 @@ type RespostaLogin = {
   usuario: Usuario;
 };
 
+type DadosCadastro = {
+  nome: string;
+  email: string;
+  senha: string;
+  tipo_usuario: TipoUsuario;
+  crm?: string;
+  uf_crm?: string;
+  especialidade?: string;
+  consentimento_dados: boolean;
+};
+
 function normalizarTipo(tipo: string): TipoUsuario | null {
   const valor = tipo.trim().toUpperCase();
 
-  if (['PACIENTE', 'CLIENTE'].includes(valor)) return 'PACIENTE';
+  if (['PACIENTE', 'CLIENTE'].includes(valor)) {
+    return 'PACIENTE';
+  }
+
   if (['PROFISSIONAL', 'MEDICO', 'MÉDICO'].includes(valor)) {
     return 'PROFISSIONAL';
   }
@@ -31,28 +44,36 @@ function normalizarTipo(tipo: string): TipoUsuario | null {
   return null;
 }
 
+function obterUrlApi(): string {
+  if (!API_URL) {
+    throw new Error(
+      'A URL da API não foi configurada no arquivo .env.',
+    );
+  }
+
+  return API_URL.replace(/\/+$/, '');
+}
+
 export async function fazerLogin(
   email: string,
   senha: string,
 ): Promise<{ usuario: Usuario; tipo: TipoUsuario }> {
-  if (!API_URL) {
-    throw new Error('A URL da API não foi configurada no arquivo .env.');
-  }
+  const url = obterUrlApi();
 
   let resposta: Response;
 
   try {
-    resposta = await fetch(
-      `${API_URL.replace(/\/$/, '')}/api/auth/login`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({ email: email.trim(), senha }),
+    resposta = await fetch(`${url}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
-    );
+      body: JSON.stringify({
+        email: email.trim(),
+        senha,
+      }),
+    });
   } catch {
     throw new Error(
       'Não foi possível conectar ao servidor. Verifique a rede e se o backend está ativo.',
@@ -73,7 +94,9 @@ export async function fazerLogin(
     throw new Error('A resposta do servidor está incompleta.');
   }
 
-  const tipo = normalizarTipo(dados.usuario.tipo_usuario ?? dados.usuario.tipo);
+  const tipo = normalizarTipo(
+    dados.usuario.tipo_usuario ?? dados.usuario.tipo ?? '',
+  );
 
   if (!tipo) {
     throw new Error(
@@ -81,28 +104,62 @@ export async function fazerLogin(
     );
   }
 
-  const sessao: RespostaLogin = {
-    token: dados.token,
-    usuario: {
-      ...dados.usuario,
-      tipo_usuario: tipo,
-    },
-    mensagem: dados.mensagem,
+  const usuario: Usuario = {
+    ...dados.usuario,
+    tipo_usuario: tipo,
   };
 
   try {
-    await SecureStore.setItemAsync(TOKEN_KEY, sessao.token);
+    await SecureStore.setItemAsync(TOKEN_KEY, dados.token);
     await SecureStore.setItemAsync(
       USER_KEY,
-      JSON.stringify(sessao.usuario),
+      JSON.stringify(usuario),
     );
   } catch {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
     await SecureStore.deleteItemAsync(USER_KEY);
-    throw new Error('Não foi possível salvar a sessão com segurança.');
+
+    throw new Error(
+      'Não foi possível salvar a sessão com segurança.',
+    );
   }
 
-  return { usuario: sessao.usuario, tipo };
+  return { usuario, tipo };
+}
+
+export async function cadastrarUsuario(
+  dados: DadosCadastro,
+): Promise<void> {
+  const url = obterUrlApi();
+
+  let resposta: Response;
+
+  try {
+    resposta = await fetch(`${url}/api/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(dados),
+    });
+  } catch {
+    throw new Error(
+      'Não foi possível conectar ao servidor. Verifique se o backend está ativo.',
+    );
+  }
+
+  const resultado = await resposta.json().catch(() => null);
+
+  if (!resposta.ok) {
+    throw new Error(
+      resultado?.mensagem ||
+        resultado?.message ||
+        (resposta.status === 409
+          ? 'Este e-mail já está cadastrado.'
+          : 'Não foi possível concluir o cadastro.'),
+    );
+  }
 }
 
 export async function obterToken(): Promise<string | null> {
@@ -111,7 +168,10 @@ export async function obterToken(): Promise<string | null> {
 
 export async function obterUsuario(): Promise<Usuario | null> {
   const valor = await SecureStore.getItemAsync(USER_KEY);
-  if (!valor) return null;
+
+  if (!valor) {
+    return null;
+  }
 
   try {
     return JSON.parse(valor) as Usuario;
