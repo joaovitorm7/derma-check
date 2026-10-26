@@ -1,3 +1,4 @@
+
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
@@ -12,33 +13,44 @@ import { onboardingFoiConcluido } from '../services/onboardingStorage';
 
 export default function Index() {
   const router = useRouter();
-
   const [verificando, setVerificando] = useState(true);
   const [mostrarOnboarding, setMostrarOnboarding] = useState(false);
 
   useEffect(() => {
-    let ativo = true;
+    let cancelado = false;
 
-    async function verificarInicializacao() {
-      const concluido = await onboardingFoiConcluido();
+    const verificarInicializacao = async () => {
+      try {
+        const concluido = await onboardingFoiConcluido();
+        // const concluido = false;
 
-      if (!ativo) return;
+        if (cancelado) return;
 
-      if (concluido) {
-        router.replace(ROTAS.aposOnboarding);
-      } else {
+        if (concluido) {
+          router.replace(ROTAS.aposOnboarding);
+          return;
+        }
+
         setMostrarOnboarding(true);
-      }
+      } catch (erro) {
+        console.error('Erro ao verificar onboarding:', erro);
 
-      setVerificando(false);
-    }
+        if (!cancelado) {
+          setMostrarOnboarding(true);
+        }
+      } finally {
+        if (!cancelado) {
+          setVerificando(false);
+        }
+      }
+    };
 
     void verificarInicializacao();
 
     return () => {
-      ativo = false;
+      cancelado = true;
     };
-  }, [router]);
+  }, []);
 
   if (verificando) {
     return (
