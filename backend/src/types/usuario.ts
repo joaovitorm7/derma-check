@@ -8,6 +8,7 @@ export interface IUsuarioCadastro {
   crm?: string;          // Obrigatório apenas se tipo_usuario === 'PROFISSIONAL'
   especialidade?: string;// Opcional para profissionais
   telefone?: string;
+  consentimento_dados?: boolean;
 }
 
 export interface IUsuarioLogin {
