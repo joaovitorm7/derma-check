@@ -154,12 +154,7 @@ export default function Login() {
 
           <Pressable
             accessibilityRole="button"
-            onPress={() => {
-              Alert.alert(
-                'Recuperar senha',
-                'A recuperação de senha precisa ser conectada ao endpoint correspondente do backend.',
-              );
-            }}
+            onPress={() => router.push('/esqueci-senha')}
             disabled={carregando}
             style={estilos.linkEsquecido}
           >
@@ -192,12 +187,7 @@ export default function Login() {
           <Pressable
             accessibilityRole="button"
             disabled={carregando}
-            onPress={() => {
-              Alert.alert(
-                'Criar conta',
-                'A tela de cadastro ainda precisa ser implementada.',
-              );
-            }}
+            onPress={() => router.push('/cadastro')}
           >
             <Text style={estilos.linkCentral}>
               Ainda não tem conta?{' '}
