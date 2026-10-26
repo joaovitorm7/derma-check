@@ -46,7 +46,7 @@ export default function Login() {
 
       const resultado = await fazerLogin(email.trim(), senha);
 
-      redirecionarPorPerfil(resultado.tipo);
+      redirecionarPorPerfil(resultado.tipo_usuario);
     } catch (erro) {
       Alert.alert(
         'Não foi possível entrar',
@@ -59,14 +59,8 @@ export default function Login() {
     }
   };
 
-  const redirecionarPorPerfil = (tipo: TipoUsuario) => {
-    // Enquanto as telas específicas não existirem,
-    // direciona para a tela disponível no projeto.
-    if (tipo === 'PACIENTE') {
-      router.replace('/explore');
-    } else {
-      router.replace('/explore');
-    }
+  const redirecionarPorPerfil = (_tipo: TipoUsuario) => {
+    router.replace('/explore');
   };
 
   return (
@@ -153,7 +147,7 @@ export default function Login() {
 
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.push('/esqueci-senha')}
+            onPress={() => router.push('/esqueci-senha' as never)}
             disabled={carregando}
             style={estilos.linkEsquecido}
           >
@@ -186,7 +180,7 @@ export default function Login() {
           <Pressable
             accessibilityRole="button"
             disabled={carregando}
-            onPress={() => router.push('/cadastro')}
+            onPress={() => router.push('/cadastro' as never)}
           >
             <Text style={estilos.linkCentral}>
               Ainda não tem conta?{' '}
