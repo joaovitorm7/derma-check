@@ -31,7 +31,7 @@ export default function OnboardingIndicadores({
             borderRadius: 5,
             backgroundColor:
               paginaAtual === indice
-                ? cores.azul
+                ? cores.azulEscuro
                 : '#C4D7EB',
           }}
         />

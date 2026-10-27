@@ -94,7 +94,7 @@ export default function Onboarding() {
   function entrar() {
     if (finalizando) return;
 
-    router.push(ROTAS.login);
+    router.replace(ROTAS.login);
   }
 
   return (
@@ -163,7 +163,7 @@ export default function Onboarding() {
           color: cores.azulEscuro,
         }}
       >
-        Derma<Text style={{ color: cores.azul }}>Check</Text>
+        Derma<Text style={{ color: cores.azulEscuro }}>Check</Text>
       </Text>
 
       <Text

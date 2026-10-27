@@ -2,25 +2,24 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+    ActivityIndicator,
+    Alert,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    Pressable,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ROTAS } from '../constants/rotas';
 import { cores } from '../constants/tema';
-import {
-  fazerLogin,
-  type TipoUsuario,
-} from '../services/authService';
+import { fazerLogin } from '../services/authService';
 
 export default function Login() {
   const router = useRouter();
@@ -29,14 +28,7 @@ export default function Login() {
   const [senha, setSenha] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [carregando, setCarregando] = useState(false);
-
-  const redirecionarPorPerfil = (tipo: TipoUsuario) => {
-    if (tipo === 'PROFISSIONAL') {
-      router.replace('/(tabs)' as never);
-    } else {
-      router.replace('/explore' as never);
-    }
-  };
+  const [loginRealizado, setLoginRealizado] = useState(false);
 
   const entrar = async () => {
     if (!email.trim() || !senha) {
@@ -55,9 +47,8 @@ export default function Login() {
     try {
       setCarregando(true);
 
-      const resultado = await fazerLogin(email.trim(), senha);
-
-      redirecionarPorPerfil(resultado.tipo_usuario);
+      await fazerLogin(email.trim(), senha);
+      setLoginRealizado(true);
     } catch (erro) {
       Alert.alert(
         'Não foi possível entrar',
@@ -71,21 +62,22 @@ export default function Login() {
   };
 
   return (
-    <SafeAreaView
-      style={estilos.areaSegura}
-      edges={['top', 'bottom']}
-    >
-      <StatusBar barStyle="dark-content" />
-
-      <KeyboardAvoidingView
-        style={estilos.teclado}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    <>
+      <SafeAreaView
+        style={estilos.areaSegura}
+        edges={['top', 'bottom']}
       >
-        <ScrollView
-          contentContainerStyle={estilos.conteudo}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+        <StatusBar barStyle="dark-content" />
+
+        <KeyboardAvoidingView
+          style={estilos.teclado}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
+          <ScrollView
+            contentContainerStyle={estilos.conteudo}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
           <View style={estilos.logo}>
             <Ionicons
               name="medkit"
@@ -166,7 +158,7 @@ export default function Login() {
 
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.push('/esqueci-senha' as never)}
+            onPress={() => router.push(ROTAS.esqueciSenha)}
             disabled={carregando}
             style={estilos.linkEsquecido}
           >
@@ -201,7 +193,7 @@ export default function Login() {
           <Pressable
             accessibilityRole="button"
             disabled={carregando}
-            onPress={() => router.push('/cadastro' as never)}
+            onPress={() => router.push(ROTAS.cadastro)}
           >
             <Text style={estilos.linkCentral}>
               Ainda não tem conta?{' '}
@@ -210,9 +202,32 @@ export default function Login() {
               </Text>
             </Text>
           </Pressable>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+      <Modal
+        visible={loginRealizado}
+        transparent
+        animationType="fade"
+        onRequestClose={() => router.replace(ROTAS.inicio)}
+      >
+        <View style={estilos.modalFundo}>
+          <View style={estilos.modalConteudo} accessibilityRole="alert">
+            <Text style={estilos.modalTitulo}>Login realizado!</Text>
+            <Text style={estilos.modalMensagem}>
+              Acesso confirmado. Você já pode continuar para a tela inicial.
+            </Text>
+            <Pressable
+              onPress={() => router.replace(ROTAS.inicio)}
+              style={estilos.botaoEntrar}
+              accessibilityRole="button"
+            >
+              <Text style={estilos.botaoTexto}>Continuar</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
@@ -340,5 +355,26 @@ const estilos = StyleSheet.create({
   destaqueLink: {
     color: cores.azulEscuro,
     fontWeight: '700',
+  },
+  modalFundo: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  modalConteudo: {
+    backgroundColor: cores.branco,
+    borderRadius: 18,
+    padding: 24,
+  },
+  modalTitulo: {
+    color: cores.azulEscuro,
+    fontSize: 22,
+    fontWeight: '800',
+  },
+  modalMensagem: {
+    color: cores.textoSecundario,
+    lineHeight: 22,
+    marginTop: 10,
   },
 });
