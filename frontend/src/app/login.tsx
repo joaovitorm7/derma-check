@@ -2,24 +2,24 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { cores } from '../constants/tema';
 import {
-    fazerLogin,
-    type TipoUsuario,
+  fazerLogin,
+  type TipoUsuario,
 } from '../services/authService';
 
 export default function Login() {
@@ -30,9 +30,20 @@ export default function Login() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [carregando, setCarregando] = useState(false);
 
+  const redirecionarPorPerfil = (tipo: TipoUsuario) => {
+    if (tipo === 'PROFISSIONAL') {
+      router.replace('/(tabs)' as never);
+    } else {
+      router.replace('/explore' as never);
+    }
+  };
+
   const entrar = async () => {
     if (!email.trim() || !senha) {
-      Alert.alert('Atenção', 'Preencha seu e-mail e sua senha.');
+      Alert.alert(
+        'Atenção',
+        'Preencha seu e-mail e sua senha.',
+      );
       return;
     }
 
@@ -59,19 +70,11 @@ export default function Login() {
     }
   };
 
-  const redirecionarPorPerfil = (tipo: TipoUsuario) => {
-  // Redireciona para o grupo principal de abas da área logada
-  if (tipo === 'PROFISSIONAL') {
-    // Caso tenham uma tela específica para médicos/profissionais no futuro:
-    router.replace('/(tabs)' as never);
-  } else {
-    // Para clientes/pacientes
-    router.replace('/explore' as never);
-  }
-};
-
   return (
-    <SafeAreaView style={estilos.areaSegura} edges={['top', 'bottom']}>
+    <SafeAreaView
+      style={estilos.areaSegura}
+      edges={['top', 'bottom']}
+    >
       <StatusBar barStyle="dark-content" />
 
       <KeyboardAvoidingView
@@ -91,7 +94,9 @@ export default function Login() {
             />
           </View>
 
-          <Text style={estilos.titulo}>Bem-vindo de volta!</Text>
+          <Text style={estilos.titulo}>
+            Bem-vindo de volta!
+          </Text>
 
           <Text style={estilos.subtitulo}>
             Entre na sua conta DermaCheck.
@@ -131,7 +136,7 @@ export default function Login() {
                 autoCorrect={false}
                 editable={!carregando}
                 returnKeyType="done"
-                onSubmitEditing={entrar}
+                onSubmitEditing={() => entrar()}
               />
 
               <Pressable
@@ -139,12 +144,19 @@ export default function Login() {
                 accessibilityLabel={
                   mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'
                 }
-                onPress={() => setMostrarSenha((valor) => !valor)}
+                onPress={() =>
+                  setMostrarSenha((valor) => !valor)
+                }
                 style={estilos.botaoOlho}
                 hitSlop={8}
+                disabled={carregando}
               >
                 <Ionicons
-                  name={mostrarSenha ? 'eye-off-outline' : 'eye-outline'}
+                  name={
+                    mostrarSenha
+                      ? 'eye-off-outline'
+                      : 'eye-outline'
+                  }
                   size={22}
                   color={cores.textoSuave}
                 />
@@ -165,11 +177,13 @@ export default function Login() {
 
           <Pressable
             accessibilityRole="button"
-            onPress={entrar}
+            onPress={() => entrar()}
             disabled={carregando}
             style={({ pressed }) => [
               estilos.botaoEntrar,
-              pressed && !carregando && estilos.botaoPressionado,
+              pressed &&
+                !carregando &&
+                estilos.botaoPressionado,
               carregando && estilos.botaoDesativado,
             ]}
           >
@@ -191,7 +205,9 @@ export default function Login() {
           >
             <Text style={estilos.linkCentral}>
               Ainda não tem conta?{' '}
-              <Text style={estilos.destaqueLink}>Cadastre-se</Text>
+              <Text style={estilos.destaqueLink}>
+                Cadastre-se
+              </Text>
             </Text>
           </Pressable>
         </ScrollView>
