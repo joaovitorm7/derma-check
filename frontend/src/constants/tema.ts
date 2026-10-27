@@ -1,5 +1,4 @@
 export const cores = {
-<<<<<<< HEAD
   fundo: '#F2F8FF',
   branco: '#FFFFFF',
   azulEscuro: '#2463A6',
@@ -10,22 +9,3 @@ export const cores = {
   placeholder: '#8A9AAF',
   borda: '#D5E2F0',
 } as const;
-=======
-  azul: '#75B8F5',
-  azulEscuro: '#2463A6',
-  fundo: '#F2F8FF',
-  branco: '#FFFFFF',
-  azulClaro: '#DCEEFF',
-  azulSuave: '#EAF4FF',
-  azulInfo: '#E5F1FF',
-  borda: '#DCE8F5',
-  bordaSuave: '#E3EDF7',
-  textoPrincipal: '#243B53',
-  textoTitulo: '#294B6B',
-  textoSecundario: '#4F6479',
-  textoSuave: '#5F7186',
-  placeholder: '#6B7C90',
-  alerta: '#FFF5E7',
-  alertaBorda: '#F4E1C5',
-};
->>>>>>> master
