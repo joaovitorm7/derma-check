@@ -34,3 +34,8 @@ npm run build:backend
 
 Para configurar o backend, copie `backend/.env.example` para `backend/.env` e preencha
 as credenciais locais. O arquivo `.env` não deve ser versionado.
+
+Para configurar o frontend, copie `frontend/.env.example` para `frontend/.env` e ajuste
+`EXPO_PUBLIC_API_URL` conforme o ambiente. O emulador Android usa `10.0.2.2`, enquanto
+um dispositivo físico precisa do IP local da máquina. A API de autenticação usa
+`POST /api/auth/register` e `POST /api/auth/login`.

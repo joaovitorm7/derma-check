@@ -1,4 +1,3 @@
-
 import { router } from 'expo-router';
 import {
   Bell,
@@ -40,27 +39,24 @@ function Atalho({ titulo, descricao, icone, destino }: AtalhoProps) {
   return (
     <Pressable
       style={({ pressed }) => [
-        styles.atalho,
+        styles.atalhoCard,
         pressed && styles.pressionado,
       ]}
       onPress={() => router.push(destino as never)}
       accessibilityRole="button"
-      accessibilityLabel={`${titulo}. ${descricao}`}
+      accessibilityLabel={titulo}
     >
-      <View style={styles.iconeAtalho}>{icone}</View>
-
-      <View style={styles.textoAtalho}>
-        <Text style={styles.tituloAtalho}>{titulo}</Text>
-        <Text style={styles.descricaoAtalho}>{descricao}</Text>
+      <View style={styles.atalhoIconeContainer}>{icone}</View>
+      <View style={styles.atalhoTextos}>
+        <Text style={styles.atalhoTitulo}>{titulo}</Text>
+        <Text style={styles.atalhoDescricao}>{descricao}</Text>
       </View>
-
       <ChevronRight size={21} color="#7890A8" />
     </Pressable>
   );
 }
 
 export default function Inicio() {
-  // Substitua pelo nome do usuário autenticado, quando disponível.
   const nomeUsuario = 'Olá';
 
   return (
@@ -69,6 +65,7 @@ export default function Inicio() {
         contentContainerStyle={styles.conteudo}
         showsVerticalScrollIndicator={false}
       >
+        {/* Cabeçalho */}
         <View style={styles.cabecalho}>
           <View>
             <Text style={styles.marca}>
@@ -98,17 +95,20 @@ export default function Inicio() {
           </View>
         </View>
 
+        {/* Card de Boas-Vindas */}
         <View style={styles.boasVindas}>
-          <Text style={styles.ola}>{nomeUsuario}, seja bem-vindo(a)!</Text>
-          <Text style={styles.textoBoasVindas}>
-            Cuidar da pele também é prestar atenção às pequenas mudanças.
-          </Text>
-
+          <View style={{ flex: 1 }}>
+            <Text style={styles.ola}>{nomeUsuario}, seja bem-vindo(a)!</Text>
+            <Text style={styles.textoBoasVindas}>
+              Cuidar da pele também é prestar atenção às pequenas mudanças.
+            </Text>
+          </View>
           <View style={styles.destaqueIcone}>
             <ShieldCheck size={34} color="#FFFFFF" />
           </View>
         </View>
 
+        {/* Botão de Ação Principal */}
         <Pressable
           style={({ pressed }) => [
             styles.botaoPrincipal,
@@ -131,6 +131,7 @@ export default function Inicio() {
           <ChevronRight size={23} color="#FFFFFF" />
         </Pressable>
 
+        {/* Lista de Atalhos */}
         <Text style={styles.tituloSecao}>O que você deseja fazer?</Text>
 
         <View style={styles.listaAtalhos}>
@@ -170,20 +171,19 @@ export default function Inicio() {
           />
         </View>
 
+        {/* Aviso de Isenção de Responsabilidade */}
         <View style={styles.aviso}>
           <ShieldCheck size={23} color={AZUL} />
-
           <View style={styles.avisoTexto}>
             <Text style={styles.avisoTitulo}>Importante</Text>
             <Text style={styles.avisoDescricao}>
-              O DermaCheck ajuda a organizar informações e acompanhar
-              mudanças na pele, mas não substitui a avaliação de um
-              profissional de saúde.
+              O DermaCheck ajuda a organizar informações e acompanhar mudanças na pele, mas não substitui a avaliação de um profissional de saúde.
             </Text>
           </View>
         </View>
       </ScrollView>
 
+      {/* Barra de Navegação Inferior */}
       <View style={styles.navegacao}>
         <ItemNavegacao
           titulo="Início"
@@ -191,25 +191,21 @@ export default function Inicio() {
           ativo
           destino="/"
         />
-
         <ItemNavegacao
           titulo="Histórico"
           icone={<Clock size={22} />}
           destino="/historico"
         />
-
         <ItemNavegacao
           titulo="Diário"
           icone={<BookOpen size={22} />}
           destino="/diario"
         />
-
         <ItemNavegacao
           titulo="Mensagens"
           icone={<MessageCircle size={22} />}
           destino="/mensagens"
         />
-
         <ItemNavegacao
           titulo="Perfil"
           icone={<UserRound size={22} />}
@@ -244,7 +240,7 @@ function ItemNavegacao({
       <View style={ativo ? styles.iconeAtivo : styles.iconeInativo}>
         {React.cloneElement(
           icone as React.ReactElement<{ color?: string }>,
-          { color: ativo ? AZUL : '#8293A5' },
+          { color: ativo ? AZUL : '#8293A5' }
         )}
       </View>
 
@@ -262,17 +258,17 @@ const styles = StyleSheet.create({
   },
   conteudo: {
     paddingHorizontal: 20,
-    paddingTop: 12,
+    paddingTop: 16,
     paddingBottom: 24,
+    gap: 18,
   },
   cabecalho: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    alignItems: 'center',
   },
   marca: {
-    fontSize: 25,
+    fontSize: 22,
     fontWeight: '800',
     color: TEXTO,
   },
@@ -281,183 +277,171 @@ const styles = StyleSheet.create({
   },
   subtituloMarca: {
     fontSize: 12,
-    color: '#71849A',
-    marginTop: 3,
+    color: '#64748B',
+    marginTop: 2,
   },
   acoesCabecalho: {
     flexDirection: 'row',
-    gap: 9,
+    gap: 10,
   },
   botaoIcone: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#E2EBF5',
+    borderColor: '#E2E8F0',
   },
   boasVindas: {
+    flexDirection: 'row',
     backgroundColor: AZUL_CLARO,
-    borderRadius: 22,
-    padding: 21,
-    marginBottom: 18,
-    overflow: 'hidden',
+    padding: 18,
+    borderRadius: 16,
+    alignItems: 'center',
+    gap: 12,
   },
   ola: {
-    fontSize: 22,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: '700',
     color: TEXTO,
-    maxWidth: '90%',
   },
   textoBoasVindas: {
-    color: '#4E6882',
-    fontSize: 14,
-    lineHeight: 21,
-    marginTop: 9,
-    maxWidth: '90%',
+    fontSize: 13,
+    color: '#475569',
+    marginTop: 4,
+    lineHeight: 18,
   },
   destaqueIcone: {
-    position: 'absolute',
-    right: -8,
-    bottom: -12,
-    width: 78,
-    height: 78,
-    borderRadius: 40,
-    backgroundColor: '#8DBBE7',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: AZUL,
     alignItems: 'center',
     justifyContent: 'center',
-    opacity: 0.9,
   },
   botaoPrincipal: {
-    backgroundColor: AZUL,
-    borderRadius: 18,
-    padding: 17,
     flexDirection: 'row',
+    backgroundColor: AZUL,
+    padding: 16,
+    borderRadius: 16,
     alignItems: 'center',
-    marginBottom: 27,
+    gap: 12,
   },
   maisIcone: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#FFFFFF',
-    borderRadius: 13,
-    width: 44,
-    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
   botaoPrincipalTexto: {
     flex: 1,
-    marginLeft: 13,
   },
   botaoPrincipalTitulo: {
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '700',
     color: '#FFFFFF',
   },
   botaoPrincipalDescricao: {
     fontSize: 12,
-    color: '#E2EEFC',
-    marginTop: 4,
+    color: '#E0F2FE',
+    marginTop: 2,
   },
   tituloSecao: {
+    fontSize: 16,
+    fontWeight: '700',
     color: TEXTO,
-    fontSize: 18,
-    fontWeight: '800',
-    marginBottom: 14,
+    marginTop: 6,
   },
   listaAtalhos: {
     gap: 10,
   },
-  atalho: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E5EDF6',
-    padding: 14,
+  atalhoCard: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  pressionado: {
-    opacity: 0.75,
-  },
-  iconeAtalho: {
-    width: 46,
-    height: 46,
+    backgroundColor: '#FFFFFF',
+    padding: 14,
     borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    gap: 12,
+  },
+  atalhoIconeContainer: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
     backgroundColor: AZUL_CLARO,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  textoAtalho: {
+  atalhoTextos: {
     flex: 1,
-    marginLeft: 13,
-    marginRight: 8,
   },
-  tituloAtalho: {
+  atalhoTitulo: {
+    fontSize: 14,
+    fontWeight: '600',
     color: TEXTO,
-    fontSize: 15,
-    fontWeight: '700',
   },
-  descricaoAtalho: {
-    color: '#71849A',
+  atalhoDescricao: {
     fontSize: 12,
-    lineHeight: 18,
-    marginTop: 4,
+    color: '#64748B',
+    marginTop: 2,
+  },
+  pressionado: {
+    opacity: 0.8,
   },
   aviso: {
-    backgroundColor: '#EAF3FC',
-    borderRadius: 16,
-    padding: 15,
     flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    gap: 12,
     alignItems: 'flex-start',
-    gap: 11,
-    marginTop: 22,
   },
   avisoTexto: {
     flex: 1,
   },
   avisoTitulo: {
+    fontSize: 13,
+    fontWeight: '700',
     color: TEXTO,
-    fontSize: 14,
-    fontWeight: '800',
-    marginBottom: 5,
   },
   avisoDescricao: {
-    color: '#4E6882',
     fontSize: 12,
-    lineHeight: 19,
+    color: '#64748B',
+    marginTop: 2,
+    lineHeight: 17,
   },
   navegacao: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#E4ECF5',
-    paddingTop: 10,
-    paddingBottom: 8,
+    borderTopColor: '#E2E8F0',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    justifyContent: 'space-around',
   },
   itemNavegacao: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
     gap: 4,
   },
   iconeAtivo: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 2,
   },
   iconeInativo: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 2,
   },
   textoNavegacao: {
-    fontSize: 10,
+    fontSize: 11,
     color: '#8293A5',
   },
   textoAtivo: {
     color: AZUL,
-    fontWeight: '800',
+    fontWeight: '600',
   },
 });

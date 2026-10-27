@@ -20,7 +20,10 @@ export const autenticarToken = (req: Request, res: Response, next: NextFunction)
   }
 
   try {
-    const secret = process.env.JWT_SECRET || 'chave_secreta_padrao';
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      return res.status(500).json({ mensagem: 'Configuração de autenticação indisponível.' });
+    }
     const decoded = jwt.verify(token, secret) as ITokenPayload;
 
     req.usuarioLogado = decoded;

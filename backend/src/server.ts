@@ -8,7 +8,13 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Configuração completa do CORS para ambiente de desenvolvimento
+app.use(cors({
+  origin: '*', // Permite requisições de qualquer origem (Web, Expo, Celular)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // Rotas públicas de Autenticação
@@ -18,6 +24,6 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'API Derma-check online' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor Derma-check rodando na porta ${PORT}`);
+app.listen(Number(PORT), '0.0.0.0', () => {
+  console.log(`🚀 Servidor Derma-check rodando na porta ${PORT}`);
 });

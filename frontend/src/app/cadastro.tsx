@@ -1,76 +1,32 @@
-
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
-import { cadastrarUsuario } from '../services/authService';
-
-type Perfil = 'PACIENTE' | 'PROFISSIONAL';
-
-type CampoProps = {
-  titulo: string;
-  valor: string;
-  placeholder: string;
-  onChangeText: (texto: string) => void;
-  senha?: boolean;
-  teclado?: 'default' | 'email-address';
-  maiusculas?: 'none' | 'words' | 'sentences' | 'characters';
-};
-
-function Campo({
-  titulo,
-  valor,
-  placeholder,
-  onChangeText,
-  senha = false,
-  teclado = 'default',
-  maiusculas = 'none',
-}: CampoProps) {
-  return (
-    <View style={estilos.grupoCampo}>
-      <Text style={estilos.rotulo}>{titulo}</Text>
-      <TextInput
-        style={estilos.campo}
-        value={valor}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#8A9AAF"
-        secureTextEntry={senha}
-        keyboardType={teclado === 'email-address' ? 'email-address' : 'default'}
-        autoCapitalize={maiusculas}
-        autoCorrect={false}
-        underlineColorAndroid="transparent"
-        blurOnSubmit={false}
-        returnKeyType="next"
-      />
-    </View>
-  );
-}
+import { cores } from '../constants/tema';
+import { cadastrarUsuario, type TipoUsuario } from '../services/authService';
 
 export default function Cadastro() {
-  const [perfil, setPerfil] = useState<Perfil>('PACIENTE');
+  const [tipo, setTipo] = useState<TipoUsuario>('CLIENTE');
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
-  const [registro, setRegistro] = useState('');
   const [senha, setSenha] = useState('');
-  const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [confirmacao, setConfirmacao] = useState('');
+  const [crm, setCrm] = useState('');
   const [consentimento, setConsentimento] = useState(false);
   const [carregando, setCarregando] = useState(false);
 
-  async function realizarCadastro() {
-    if (carregando) return;
-
+  async function enviar() {
     const nomeLimpo = nome.trim();
     const emailLimpo = email.trim().toLowerCase();
 
@@ -78,76 +34,45 @@ export default function Cadastro() {
       Alert.alert('Nome inválido', 'Informe seu nome completo.');
       return;
     }
-
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLimpo)) {
-      Alert.alert('E-mail inválido', 'Informe um endereço de e-mail válido.');
+      Alert.alert('E-mail inválido', 'Informe um endereço válido.');
       return;
     }
-
-    if (perfil === 'PROFISSIONAL' && !registro.trim()) {
-      Alert.alert(
-        'Registro obrigatório',
-        'Informe seu registro profissional conforme solicitado pelo projeto.'
-      );
+    if (tipo === 'PROFISSIONAL' && !crm.trim()) {
+      Alert.alert('Registro obrigatório', 'Informe seu CRM.');
       return;
     }
-
-    if (senha.length < 8 || !/[A-Za-zÀ-ÿ]/.test(senha) || !/[0-9]/.test(senha)) {
-      Alert.alert(
-        'Senha inválida',
-        'Use pelo menos 8 caracteres, incluindo letras e números.'
-      );
+    if (senha.length < 8 || !/[A-Za-zÀ-ÿ]/.test(senha) || !/\d/.test(senha)) {
+      Alert.alert('Senha inválida', 'Use 8 caracteres, com letras e números.');
       return;
     }
-
-    if (senha !== confirmarSenha) {
+    if (senha !== confirmacao) {
       Alert.alert('Senhas diferentes', 'A confirmação deve ser igual à senha.');
       return;
     }
-
     if (!consentimento) {
-      Alert.alert(
-        'Consentimento necessário',
-        'Leia e aceite o termo de consentimento e privacidade para continuar.'
-      );
+      Alert.alert('Consentimento necessário', 'Aceite os termos para continuar.');
       return;
     }
 
     try {
       setCarregando(true);
-
       await cadastrarUsuario({
         nome: nomeLimpo,
         email: emailLimpo,
         senha,
-        tipo_usuario: perfil,
-        consentimento_dados: consentimento,
-        ...(perfil === 'PROFISSIONAL'
-        ? {
-        crm: registro.trim(),
-        }
-        : {}),
-    });
-
+        tipo_usuario: tipo,
+        crm: tipo === 'PROFISSIONAL' ? crm.trim() : undefined,
+        consentimento_dados: true,
+      });
+      Alert.alert('Cadastro realizado', 'Agora você pode entrar na sua conta.', [
+        { text: 'Ir para login', onPress: () => router.replace('/login' as never) },
+      ]);
+    } catch (erro) {
       Alert.alert(
-        'Cadastro realizado',
-        'Sua conta foi criada. Agora você pode entrar no DermaCheck.',
-        [
-          {
-            text: 'Ir para login',
-            onPress: () => router.replace('/login'),
-          },
-        ],
-        { cancelable: false }
+        'Não foi possível cadastrar',
+        erro instanceof Error ? erro.message : 'Tente novamente.',
       );
-    } catch (erro: any) {
-      const mensagem =
-        erro?.response?.data?.mensagem ||
-        erro?.response?.data?.message ||
-        erro?.message ||
-        'Não foi possível realizar o cadastro. Tente novamente.';
-
-      Alert.alert('Não foi possível cadastrar', mensagem);
     } finally {
       setCarregando(false);
     }
@@ -155,280 +80,84 @@ export default function Cadastro() {
 
   return (
     <KeyboardAvoidingView
-      style={estilos.tela}
+      style={styles.tela}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView
-        style={estilos.scroll}
-        contentContainerStyle={estilos.conteudo}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="none"
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={estilos.cabecalho}>
-          <View style={estilos.logo}>
-            <Text style={estilos.logoTexto}>D</Text>
-          </View>
-
-          <Text style={estilos.titulo}>Criar conta</Text>
-          <Text style={estilos.subtitulo}>
-            Cadastre-se para acompanhar e cuidar melhor da saúde da sua pele.
-          </Text>
-        </View>
-
-        <Text style={estilos.rotulo}>Qual é o seu perfil?</Text>
-
-        <View style={estilos.perfis}>
-          <TouchableOpacity
-            style={[
-              estilos.opcaoPerfil,
-              perfil === 'PACIENTE' && estilos.perfilSelecionado,
-            ]}
-            onPress={() => setPerfil('PACIENTE')}
-            activeOpacity={0.8}
-          >
-            <Text
-              style={[
-                estilos.textoPerfil,
-                perfil === 'PACIENTE' && estilos.textoPerfilSelecionado,
-              ]}
+      <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
+        <Text style={styles.titulo}>Criar conta</Text>
+        <Text style={styles.subtitulo}>Preencha seus dados para começar.</Text>
+        <Text style={styles.rotulo}>Perfil</Text>
+        <View style={styles.perfis}>
+          {(['CLIENTE', 'PROFISSIONAL'] as TipoUsuario[]).map((opcao) => (
+            <Pressable
+              key={opcao}
+              onPress={() => setTipo(opcao)}
+              style={[styles.perfil, tipo === opcao && styles.perfilAtivo]}
             >
-              Paciente
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              estilos.opcaoPerfil,
-              perfil === 'PROFISSIONAL' && estilos.perfilSelecionado,
-            ]}
-            onPress={() => setPerfil('PROFISSIONAL')}
-            activeOpacity={0.8}
-          >
-            <Text
-              style={[
-                estilos.textoPerfil,
-                perfil === 'PROFISSIONAL' && estilos.textoPerfilSelecionado,
-              ]}
-            >
-              Profissional
-            </Text>
-          </TouchableOpacity>
+              <Text style={[styles.textoPerfil, tipo === opcao && styles.textoPerfilAtivo]}>
+                {opcao === 'CLIENTE' ? 'Paciente' : 'Profissional'}
+              </Text>
+            </Pressable>
+          ))}
         </View>
-
-        <Campo
-          titulo="Nome completo"
-          valor={nome}
-          onChangeText={setNome}
-          placeholder="Digite seu nome completo"
-          maiusculas="words"
-        />
-
-        <Campo
-          titulo="E-mail"
-          valor={email}
-          onChangeText={setEmail}
-          placeholder="seuemail@exemplo.com"
-          teclado="email-address"
-        />
-
-        {perfil === 'PROFISSIONAL' && (
-          <Campo
-            titulo="Registro profissional"
-            valor={registro}
-            onChangeText={setRegistro}
-            placeholder="Ex.: conselho, número e UF"
-          />
+        <Campo label="Nome completo" value={nome} onChangeText={setNome} placeholder="Seu nome" />
+        <Campo label="E-mail" value={email} onChangeText={setEmail} placeholder="seuemail@exemplo.com" keyboardType="email-address" />
+        {tipo === 'PROFISSIONAL' && (
+          <Campo label="CRM" value={crm} onChangeText={setCrm} placeholder="Registro profissional" />
         )}
-
-        <Campo
-          titulo="Senha"
-          valor={senha}
-          onChangeText={setSenha}
-          placeholder="Mínimo de 8 caracteres, com letras e números"
-          senha
-        />
-
-        <Campo
-          titulo="Confirmar senha"
-          valor={confirmarSenha}
-          onChangeText={setConfirmarSenha}
-          placeholder="Digite a senha novamente"
-          senha
-        />
-
-        <View style={estilos.consentimento}>
-          <Switch
-            value={consentimento}
-            onValueChange={setConsentimento}
-            trackColor={{ false: '#CFD8E5', true: '#75B8F5' }}
-            thumbColor={consentimento ? '#2463A6' : '#FFFFFF'}
-          />
-          <Text style={estilos.textoConsentimento}>
-            Li e aceito os termos de consentimento e privacidade, incluindo o
-            tratamento dos meus dados pessoais.
-          </Text>
+        <Campo label="Senha" value={senha} onChangeText={setSenha} placeholder="Mínimo de 8 caracteres" secureTextEntry />
+        <Campo label="Confirmar senha" value={confirmacao} onChangeText={setConfirmacao} placeholder="Repita sua senha" secureTextEntry />
+        <View style={styles.consentimento}>
+          <Switch value={consentimento} onValueChange={setConsentimento} />
+          <Text style={styles.textoConsentimento}>Aceito o tratamento dos meus dados para uso do aplicativo.</Text>
         </View>
-
-        <TouchableOpacity
-          style={[estilos.botao, carregando && estilos.botaoDesativado]}
-          onPress={realizarCadastro}
-          disabled={carregando}
-          activeOpacity={0.8}
-        >
-          {carregando ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={estilos.textoBotao}>Criar minha conta</Text>
-          )}
-        </TouchableOpacity>
-
-        <View style={estilos.rodape}>
-          <Text style={estilos.textoRodape}>Já possui uma conta? </Text>
-          <TouchableOpacity
-            onPress={() => router.replace('/login')}
-            disabled={carregando}
-          >
-            <Text style={estilos.link}>Entrar</Text>
-          </TouchableOpacity>
-        </View>
+        <Pressable onPress={enviar} disabled={carregando} style={[styles.botao, carregando && styles.desabilitado]}>
+          {carregando ? <ActivityIndicator color={cores.branco} /> : <Text style={styles.textoBotao}>Criar minha conta</Text>}
+        </Pressable>
+        <Pressable onPress={() => router.replace('/login' as never)} style={styles.voltar}>
+          <Text style={styles.link}>Já tenho uma conta</Text>
+        </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-const estilos = StyleSheet.create({
-  tela: {
-    flex: 1,
-    backgroundColor: '#F2F8FF',
-  },
-  scroll: {
-    flex: 1,
-  },
-  conteudo: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 48,
-    paddingBottom: 36,
-  },
-  cabecalho: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  logo: {
-    width: 60,
-    height: 60,
-    borderRadius: 18,
-    backgroundColor: '#2463A6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  logoTexto: {
-    fontSize: 34,
-    fontWeight: '800',
-    color: '#FFFFFF',
-  },
-  titulo: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#173B65',
-    marginBottom: 8,
-  },
-  subtitulo: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: '#61758D',
-    textAlign: 'center',
-  },
-  rotulo: {
-    color: '#24415F',
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 9,
-  },
-  perfis: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 22,
-  },
-  opcaoPerfil: {
-    flex: 1,
-    paddingVertical: 14,
-    borderWidth: 1,
-    borderColor: '#C8D8E9',
-    borderRadius: 12,
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  perfilSelecionado: {
-    borderColor: '#2463A6',
-    backgroundColor: '#E2F0FF',
-  },
-  textoPerfil: {
-    fontSize: 15,
-    color: '#61758D',
-    fontWeight: '600',
-  },
-  textoPerfilSelecionado: {
-    color: '#2463A6',
-  },
-  grupoCampo: {
-    marginBottom: 17,
-  },
-  campo: {
-    width: '100%',
-    minHeight: 52,
-    borderWidth: 1,
-    borderColor: '#C8D8E9',
-    borderRadius: 12,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
-    color: '#173B65',
-    fontSize: 15,
-  },
-  consentimento: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginTop: 4,
-    marginBottom: 24,
-  },
-  textoConsentimento: {
-    flex: 1,
-    color: '#52677E',
-    fontSize: 13,
-    lineHeight: 20,
-  },
-  botao: {
-    minHeight: 54,
-    borderRadius: 13,
-    backgroundColor: '#2463A6',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  botaoDesativado: {
-    opacity: 0.65,
-  },
-  textoBotao: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  rodape: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 24,
-  },
-  textoRodape: {
-    color: '#61758D',
-    fontSize: 14,
-  },
-  link: {
-    color: '#2463A6',
-    fontWeight: '700',
-    fontSize: 14,
-  },
+type CampoProps = {
+  label: string;
+  value: string;
+  onChangeText: (value: string) => void;
+  placeholder: string;
+  keyboardType?: 'default' | 'email-address';
+  secureTextEntry?: boolean;
+};
+
+function Campo(props: CampoProps) {
+  return (
+    <View style={styles.grupo}>
+      <Text style={styles.rotulo}>{props.label}</Text>
+      <TextInput {...props} style={styles.input} autoCapitalize="none" autoCorrect={false} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  tela: { flex: 1, backgroundColor: cores.fundo },
+  conteudo: { flexGrow: 1, padding: 25, justifyContent: 'center' },
+  titulo: { fontSize: 28, fontWeight: '800', color: cores.azulEscuro },
+  subtitulo: { marginTop: 6, marginBottom: 22, color: cores.textoSecundario },
+  rotulo: { marginBottom: 8, fontWeight: '600', color: cores.textoPrincipal },
+  perfis: { flexDirection: 'row', gap: 10, marginBottom: 16 },
+  perfil: { flex: 1, padding: 13, borderRadius: 12, borderWidth: 1, borderColor: cores.borda, alignItems: 'center', backgroundColor: cores.branco },
+  perfilAtivo: { backgroundColor: cores.azulClaro, borderColor: cores.azulEscuro },
+  textoPerfil: { color: cores.textoSecundario },
+  textoPerfilAtivo: { color: cores.azulEscuro, fontWeight: '700' },
+  grupo: { marginBottom: 14 },
+  input: { minHeight: 50, borderWidth: 1, borderColor: cores.borda, borderRadius: 13, paddingHorizontal: 14, backgroundColor: cores.branco, color: cores.textoPrincipal },
+  consentimento: { flexDirection: 'row', alignItems: 'center', gap: 8, marginVertical: 8 },
+  textoConsentimento: { flex: 1, color: cores.textoSecundario, fontSize: 13 },
+  botao: { minHeight: 52, borderRadius: 15, backgroundColor: cores.azulEscuro, alignItems: 'center', justifyContent: 'center', marginTop: 14 },
+  desabilitado: { opacity: 0.7 },
+  textoBotao: { color: cores.branco, fontWeight: '700' },
+  voltar: { alignItems: 'center', padding: 18 },
+  link: { color: cores.azulEscuro, fontWeight: '700' },
 });
