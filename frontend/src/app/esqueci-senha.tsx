@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ROTAS } from '../constants/rotas';
 import { cores } from '../constants/tema';
 
 export default function EsqueciSenha() {
@@ -12,7 +13,7 @@ export default function EsqueciSenha() {
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => router.back()} style={styles.voltar}>
+      <Pressable onPress={() => router.replace(ROTAS.login)} style={styles.voltar}>
         <Text style={styles.link}>Voltar</Text>
       </Pressable>
       <View style={styles.conteudo}>
