@@ -1,16 +1,4 @@
 export const cores = {
-<<<<<<< HEAD
-  fundo: '#F2F8FF',
-  branco: '#FFFFFF',
-  azulEscuro: '#2463A6',
-  azulClaro: '#EAF3FC',
-  textoPrincipal: '#18324F',
-  textoSecundario: '#62758A',
-  textoSuave: '#71849A',
-  placeholder: '#8A9AAF',
-  borda: '#D5E2F0',
-} as const;
-=======
   azul: '#75B8F5',
   azulEscuro: '#2463A6',
   fundo: '#F2F8FF',
@@ -28,4 +16,3 @@ export const cores = {
   alerta: '#FFF5E7',
   alertaBorda: '#F4E1C5',
 };
->>>>>>> master

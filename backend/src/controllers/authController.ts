@@ -7,7 +7,7 @@ import { IUsuarioCadastro } from '../types/usuario';
 
 // 1. CADASTRO DE USUÁRIO
 export const cadastrarUsuario = async (req: Request, res: Response): Promise<Response> => {
-  console.log('📥 Requisição recebida em /cadastrar:', req.body);
+  console.log('📥 Requisição recebida em /cadastrar.');
 
   try {
     const dados: IUsuarioCadastro = {
