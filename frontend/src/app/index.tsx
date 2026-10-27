@@ -9,7 +9,7 @@ import { Spacing } from '@/constants/theme';
 export default function HomeScreen() {
   return (
     <ThemedView style={styles.screen}>
-      <SafeAreaView>
+      <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.content}>
           <ThemedText type="smallBold" themeColor="textSecondary">
             DERMA CHECK
@@ -21,6 +21,17 @@ export default function HomeScreen() {
             Registre alterações, acompanhe sua rotina e leve informações organizadas para sua
             consulta dermatológica.
           </ThemedText>
+
+          {/* AÇÕES DE AUTENTICAÇÃO */}
+          <View style={styles.authButtonsContainer}>
+            <Link href="/login" style={[styles.button, styles.primaryButton]}>
+              <ThemedText style={styles.buttonTextPrimary}>Entrar na minha conta</ThemedText>
+            </Link>
+
+            <Link href="/cadastro" style={[styles.button, styles.secondaryButton]}>
+              <ThemedText style={styles.buttonTextSecondary}>Criar nova conta</ThemedText>
+            </Link>
+          </View>
 
           <ThemedView type="backgroundSelected" style={styles.primaryCard}>
             <ThemedText type="subtitle">Comece pelo seu histórico</ThemedText>
@@ -67,6 +78,22 @@ const styles = StyleSheet.create({
   content: { gap: Spacing.three, padding: Spacing.four, paddingBottom: Spacing.six },
   title: { marginTop: Spacing.two },
   description: { maxWidth: 620 },
+  
+  // Estilos adicionados para os botões
+  authButtonsContainer: { gap: Spacing.two, marginTop: Spacing.two },
+  button: {
+    paddingVertical: Spacing.three,
+    paddingHorizontal: Spacing.four,
+    borderRadius: Spacing.three,
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+  },
+  primaryButton: { backgroundColor: '#007AFF' },
+  secondaryButton: { backgroundColor: '#E5E5EA' },
+  buttonTextPrimary: { color: '#FFFFFF', fontWeight: '600' },
+  buttonTextSecondary: { color: '#000000', fontWeight: '600' },
+
   primaryCard: { gap: Spacing.two, borderRadius: Spacing.four, padding: Spacing.four, marginTop: Spacing.two },
   action: { alignSelf: 'flex-start', marginTop: Spacing.one },
   sectionHeader: { marginTop: Spacing.three },

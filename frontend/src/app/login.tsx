@@ -59,9 +59,16 @@ export default function Login() {
     }
   };
 
-  const redirecionarPorPerfil = (_tipo: TipoUsuario) => {
-    router.replace('/explore');
-  };
+  const redirecionarPorPerfil = (tipo: TipoUsuario) => {
+  // Redireciona para o grupo principal de abas da área logada
+  if (tipo === 'PROFISSIONAL') {
+    // Caso tenham uma tela específica para médicos/profissionais no futuro:
+    router.replace('/(tabs)' as never);
+  } else {
+    // Para clientes/pacientes
+    router.replace('/explore' as never);
+  }
+};
 
   return (
     <SafeAreaView style={estilos.areaSegura} edges={['top', 'bottom']}>
