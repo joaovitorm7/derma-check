@@ -126,3 +126,32 @@ Request. Antes de começar outra tarefa, atualize a branch de destino e crie uma
 branch. Isso reduz divergências, mas conflitos ainda podem ocorrer se duas pessoas
 editarem as mesmas linhas; nesse caso, resolvam o conflito e validem novamente antes
 do merge.
+
+---
+
+## 🗄️ Configuração do Banco de Dados e Usuários de Teste
+
+Para garantir que todos os desenvolvedores utilizem a mesma estrutura de banco de dados e possuam acesso aos usuários padrão para testes (Paciente e Profissional), siga os passos abaixo.
+
+### 1. Atualizar o Repositório Local
+
+No terminal do VS Code, puxe as últimas alterações da branch principal:
+
+```bash
+git checkout main
+git pull origin main
+
+### 2. Instalar as Depend~encias do Back-end
+Caso novas bibliotecas de banco tenham sido adicionadas, atualize a pasta do servidor:
+
+cd backend
+npm install
+
+### 3. Criar os Usuários Globais
+npm run seed
+
+Credenciais Padrão para Testes
+
+PERFIL      | E-mail                        | SENHA
+Paciente    | paciente.teste@dermacheck.com | Senha123
+Médico      | medico.teste@dermacheck.com   | Senha123
