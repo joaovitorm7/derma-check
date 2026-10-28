@@ -25,5 +25,5 @@ app.get('/health', (req, res) => {
 });
 
 app.listen(Number(PORT), '0.0.0.0', () => {
-  console.log(`🚀 Servidor Derma-check rodando na porta ${PORT}`);
+  console.log(`Servidor Derma-check rodando na porta ${PORT}`);
 });
