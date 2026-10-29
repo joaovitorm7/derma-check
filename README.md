@@ -155,3 +155,17 @@ Credenciais Padrão para Testes
 PERFIL      | E-mail                        | SENHA
 Paciente    | paciente.teste@dermacheck.com | Senha123
 Médico      | medico.teste@dermacheck.com   | Senha123
+## 🗄️ Configuração e Atualização do Banco de Dados
+
+Sempre que a estrutura do banco for modificada ou você precisar recriar as tabelas e usuários de teste localmente, siga estes passos no terminal do VS Code:
+
+### 1. Criar/Atualizar as Tabelas (`schema.sql`)
+Acesse a pasta do backend e execute o script automático que lê o arquivo `schema.sql` e cria todas as tabelas no MySQL:
+
+```bash
+cd backend
+npm run db:setup
+
+### 2. Popular o Banco com Usuários e Dados de Teste(seed.ts)
+
+Para criar os usuários globais de teste (Paciente e Médico) juntamente com registros de exemplo: npm run seed
