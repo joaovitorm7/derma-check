@@ -25,6 +25,7 @@ type CampoFormulario =
   | 'nome'
   | 'email'
   | 'crm'
+  | 'especialidade'
   | 'senha'
   | 'confirmacao'
   | 'consentimento';
@@ -38,6 +39,7 @@ export default function Cadastro() {
   const [senha, setSenha] = useState('');
   const [confirmacao, setConfirmacao] = useState('');
   const [crm, setCrm] = useState('');
+  const [especialidade, setEspecialidade] = useState('');
   const [consentimento, setConsentimento] = useState(false);
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
@@ -95,6 +97,7 @@ export default function Cadastro() {
         senha,
         tipo_usuario: tipo,
         crm: tipo === 'PROFISSIONAL' ? crm.trim() : undefined,
+        especialidade: tipo === 'PROFISSIONAL' ? especialidade.trim() : undefined,
         consentimento_dados: true,
       });
       setCadastroRealizado(true);
@@ -186,14 +189,27 @@ export default function Cadastro() {
                 editable={!carregando}
               />
               {tipo === 'PROFISSIONAL' && (
-                <Campo
-                  label="CRM"
-                  value={crm}
-                  onChangeText={(valor) => atualizarCampo('crm', setCrm, valor)}
-                  placeholder="Número do registro"
-                  error={erros.crm}
-                  editable={!carregando}
-                />
+                <>
+                  <Campo
+                    label="CRM"
+                    value={crm}
+                    onChangeText={(valor) => atualizarCampo('crm', setCrm, valor)}
+                    placeholder="Número do registro"
+                    error={erros.crm}
+                    editable={!carregando}
+                  />
+                  <Campo
+                    label="Especialidade"
+                    value={especialidade}
+                    onChangeText={(valor) =>
+                      atualizarCampo('especialidade', setEspecialidade, valor)
+                    }
+                    placeholder="Ex.: Dermatologia"
+                    autoCapitalize="words"
+                    error={erros.especialidade}
+                    editable={!carregando}
+                  />
+                </>
               )}
               <Campo
                 label="Senha"
