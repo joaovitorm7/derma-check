@@ -200,6 +200,57 @@ Não faça commit diretamente em `master` nem envie alterações para a branch d
    git switch -c fix/nome-da-correcao
    ```
 
+Abra um Pull Request de `fix/backend-db-setup` para `master`, a branch de integração
+atual. O responsável pelo backend deve puxar a alteração pelo Pull Request, sem
+compartilhar a mesma branch para commits simultâneos. Se a equipe combinar outro
+destino, como `feat/auth-backend`, confirme a branch-base antes de abrir o Pull
+Request. Antes de começar outra tarefa, atualize a branch de destino e crie uma nova
+branch. Isso reduz divergências, mas conflitos ainda podem ocorrer se duas pessoas
+editarem as mesmas linhas; nesse caso, resolvam o conflito e validem novamente antes
+do merge.
+
+---
+
+## 🗄️ Configuração do Banco de Dados e Usuários de Teste
+
+Para garantir que todos os desenvolvedores utilizem a mesma estrutura de banco de dados e possuam acesso aos usuários padrão para testes (Paciente e Profissional), siga os passos abaixo.
+
+### 1. Atualizar o Repositório Local
+
+No terminal do VS Code, puxe as últimas alterações da branch principal:
+
+```bash
+git checkout main
+git pull origin main
+
+### 2. Instalar as Depend~encias do Back-end
+Caso novas bibliotecas de banco tenham sido adicionadas, atualize a pasta do servidor:
+
+cd backend
+npm install
+
+### 3. Criar os Usuários Globais
+npm run seed
+
+Credenciais Padrão para Testes
+
+PERFIL      | E-mail                        | SENHA
+Paciente    | paciente.teste@dermacheck.com | Senha123
+Médico      | medico.teste@dermacheck.com   | Senha123
+## 🗄️ Configuração e Atualização do Banco de Dados
+
+Sempre que a estrutura do banco for modificada ou você precisar recriar as tabelas e usuários de teste localmente, siga estes passos no terminal do VS Code:
+
+### 1. Criar/Atualizar as Tabelas (`schema.sql`)
+Acesse a pasta do backend e execute o script automático que lê o arquivo `schema.sql` e cria todas as tabelas no MySQL:
+
+```bash
+cd backend
+npm run db:setup
+
+### 2. Popular o Banco com Usuários e Dados de Teste(seed.ts)
+
+Para criar os usuários globais de teste (Paciente e Médico) juntamente com registros de exemplo: npm run seed
 3. **Prepare apenas o que pertence à tarefa.** Evite `git add .`:
 
    ```bash
