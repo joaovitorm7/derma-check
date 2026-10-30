@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
+import lesaoRoutes from './routes/lesaoRoutes';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 
 // Rotas públicas de Autenticação
 app.use('/api/auth', authRoutes);
+app.use('/api/lesoes', lesaoRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'API Derma-check online' });
