@@ -4,8 +4,18 @@ CREATE DATABASE IF NOT EXISTS derma_check
 
 USE derma_check;
 
+-- Desativa checagem de chaves para permitir recriação limpa
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS diario_pele;
+DROP TABLE IF EXISTS fotos_lesao;
+DROP TABLE IF EXISTS lesoes;
+DROP TABLE IF EXISTS usuarios;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
 -- 1. Tabela de Usuários (Clientes e Profissionais)
-CREATE TABLE IF NOT EXISTS usuarios (
+CREATE TABLE usuarios (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   nome VARCHAR(150) NOT NULL,
   email VARCHAR(254) NOT NULL,
@@ -24,7 +34,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   COLLATE utf8mb4_unicode_ci;
 
 -- 2. Tabela de Lesões Cutâneas (RN01, RN03, RN06)
-CREATE TABLE IF NOT EXISTS lesoes (
+CREATE TABLE lesoes (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   usuario_id INT UNSIGNED NOT NULL,
   nome_identificacao VARCHAR(100) NOT NULL,
@@ -40,7 +50,7 @@ CREATE TABLE IF NOT EXISTS lesoes (
   COLLATE utf8mb4_unicode_ci;
 
 -- 3. Tabela de Fotografias das Lesões (RN02, RN07)
-CREATE TABLE IF NOT EXISTS fotos_lesao (
+CREATE TABLE fotos_lesao (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   lesao_id INT UNSIGNED NOT NULL,
   url_foto VARCHAR(255) NOT NULL,
@@ -49,6 +59,23 @@ CREATE TABLE IF NOT EXISTS fotos_lesao (
   criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   CONSTRAINT fk_fotos_lesao FOREIGN KEY (lesao_id) REFERENCES lesoes(id) ON DELETE CASCADE
+) ENGINE=InnoDB
+  DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+-- 4. Tabela de Registros do Diário da Pele (RN01 a RN05)
+CREATE TABLE diario_pele (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  usuario_id INT UNSIGNED NOT NULL,
+  data_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  mudancas_percebidas TEXT NULL,
+  sintomas TEXT NULL,
+  exposicao_solar ENUM('BAIXO', 'MODERADO', 'ALTO') NOT NULL DEFAULT 'BAIXO',
+  url_foto VARCHAR(255) NULL,
+  criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_diario_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB
   DEFAULT CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
