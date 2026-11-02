@@ -3,7 +3,7 @@ import { pool } from '../config/database';
 
 async function criarUsuariosEDataTeste() {
   try {
-    console.log('⏳ Gerando hash das senhas de teste...');
+    console.log('Gerando hash das senhas de teste...');
     const senhaPadrao = 'Senha123';
     const senhaHash = await bcrypt.hash(senhaPadrao, 10);
 
@@ -24,8 +24,8 @@ async function criarUsuariosEDataTeste() {
       ['Dr. Carlos Dermatologista', 'medico.teste@dermacheck.com', senhaHash, 'PROFISSIONAL', '123456/CE', 'Dermatologia', '88999998888', true]
     );
 
-    // 3. Lesão de Exemplo para o Paciente (RN01, RN06)
     if (pacienteId) {
+      // 3. Lesão de Exemplo para o Paciente
       const [lesoesExistentes]: any = await pool.query(
         `SELECT id FROM lesoes WHERE usuario_id = ? AND nome_identificacao = ?`,
         [pacienteId, 'Pinta no Antebraço Esquerdo']
@@ -42,7 +42,6 @@ async function criarUsuariosEDataTeste() {
         lesaoId = lesaoResult.insertId;
       }
 
-      // 4. Fotografias de Exemplo (RN02, RN07)
       if (lesaoId) {
         const [fotosExistentes]: any = await pool.query(
           `SELECT id FROM fotos_lesao WHERE lesao_id = ?`,
@@ -58,6 +57,22 @@ async function criarUsuariosEDataTeste() {
             [lesaoId, lesaoId]
           );
         }
+      }
+
+      // 4. Registros de Exemplo para o Diário da Pele (RN01 - RN05)
+      const [diarioExistente]: any = await pool.query(
+        `SELECT id FROM diario_pele WHERE usuario_id = ?`,
+        [pacienteId]
+      );
+
+      if (diarioExistente.length === 0) {
+        await pool.query(
+          `INSERT INTO diario_pele (usuario_id, mudancas_percebidas, sintomas, exposicao_solar, url_foto)
+           VALUES 
+           (?, 'Leve vermelhidão na região do rosto após caminhada.', 'Leve ardência ao toque.', 'MODERADO', 'https://via.placeholder.com/300?text=Diario+Dia+1'),
+           (?, 'Pele hidratada, sem novas manchas aparentes.', 'Nenhum sintoma relatado.', 'BAIXO', NULL);`,
+          [pacienteId, pacienteId]
+        );
       }
     }
 
