@@ -5,8 +5,6 @@ import {
   Camera,
   ChevronRight,
   Clock,
-  House,
-  MessageCircle,
   Plus,
   Settings,
   ShieldCheck,
@@ -23,7 +21,9 @@ import {
   View,
 } from 'react-native';
 
-const AZUL = '#2463A6';
+import { BarraNavegacao } from '../components/barra-navegacao';
+
+const AZUL ='#2463A6';
 const AZUL_CLARO = '#EAF3FC';
 const FUNDO = '#F5F9FE';
 const TEXTO = '#18324F';
@@ -184,70 +184,8 @@ export default function Inicio() {
       </ScrollView>
 
       {/* Barra de Navegação Inferior */}
-      <View style={styles.navegacao}>
-        <ItemNavegacao
-          titulo="Início"
-          icone={<House size={22} />}
-          ativo
-          destino="/"
-        />
-        <ItemNavegacao
-          titulo="Histórico"
-          icone={<Clock size={22} />}
-          destino="/historico"
-        />
-        <ItemNavegacao
-          titulo="Diário"
-          icone={<BookOpen size={22} />}
-          destino="/diario"
-        />
-        <ItemNavegacao
-          titulo="Mensagens"
-          icone={<MessageCircle size={22} />}
-          destino="/mensagens"
-        />
-        <ItemNavegacao
-          titulo="Perfil"
-          icone={<UserRound size={22} />}
-          destino="/perfil"
-        />
-      </View>
+      <BarraNavegacao ativo="Início" />
     </SafeAreaView>
-  );
-}
-
-type ItemNavegacaoProps = {
-  titulo: string;
-  icone: React.ReactNode;
-  destino: string;
-  ativo?: boolean;
-};
-
-function ItemNavegacao({
-  titulo,
-  icone,
-  destino,
-  ativo = false,
-}: ItemNavegacaoProps) {
-  return (
-    <Pressable
-      style={styles.itemNavegacao}
-      onPress={() => router.push(destino as never)}
-      accessibilityRole="button"
-      accessibilityLabel={titulo}
-      accessibilityState={{ selected: ativo }}
-    >
-      <View style={ativo ? styles.iconeAtivo : styles.iconeInativo}>
-        {React.cloneElement(
-          icone as React.ReactElement<{ color?: string }>,
-          { color: ativo ? AZUL : '#8293A5' }
-        )}
-      </View>
-
-      <Text style={[styles.textoNavegacao, ativo && styles.textoAtivo]}>
-        {titulo}
-      </Text>
-    </Pressable>
   );
 }
 
@@ -416,32 +354,5 @@ const styles = StyleSheet.create({
     color: '#64748B',
     marginTop: 2,
     lineHeight: 17,
-  },
-  navegacao: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    justifyContent: 'space-around',
-  },
-  itemNavegacao: {
-    alignItems: 'center',
-    gap: 4,
-  },
-  iconeAtivo: {
-    padding: 2,
-  },
-  iconeInativo: {
-    padding: 2,
-  },
-  textoNavegacao: {
-    fontSize: 11,
-    color: '#8293A5',
-  },
-  textoAtivo: {
-    color: AZUL,
-    fontWeight: '600',
   },
 });

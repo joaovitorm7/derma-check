@@ -2,6 +2,7 @@ import type { Href } from 'expo-router';
 
 export const ROTAS = {
   inicio: '/inicio' as Href,
+  diario: '/diario' as Href,
   login: '/login' as Href,
   cadastro: '/cadastro' as Href,
   esqueciSenha: '/esqueci-senha' as Href,
