@@ -2,14 +2,13 @@ import { router } from 'expo-router';
 import {
   Bell,
   BookOpen,
-  Camera,
   ChevronRight,
   Clock,
   Plus,
   Settings,
   ShieldCheck,
   Sun,
-  UserRound,
+  UserRound
 } from 'lucide-react-native';
 import React from 'react';
 import {
@@ -135,12 +134,6 @@ export default function Inicio() {
         <Text style={styles.tituloSecao}>O que você deseja fazer?</Text>
 
         <View style={styles.listaAtalhos}>
-          <Atalho
-            titulo="Registrar lesão"
-            descricao="Adicione fotos e observações"
-            icone={<Camera size={23} color={AZUL} />}
-            destino="/nova-lesao"
-          />
 
           <Atalho
             titulo="Meu histórico"
