@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
 import lesaoRoutes from './routes/lesaoRoutes';
 import diarioRoutes from './routes/diarioRoutes';
+import lembreteRoutes from './routes/lembreteRoutes';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/lesoes', lesaoRoutes);
 app.use('/api/diario', diarioRoutes);
+app.use('/api/lembretes', lembreteRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'API Derma-check online' });
