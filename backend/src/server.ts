@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 // Configuração completa do CORS para ambiente de desenvolvimento
 app.use(cors({
   origin: '*', // Permite requisições de qualquer origem (Web, Expo, Celular)
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
