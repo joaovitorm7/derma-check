@@ -10,6 +10,7 @@ export default function RootLayout() {
         <Stack.Screen name="index" />
         <Stack.Screen name="inicio" />
         <Stack.Screen name="diario" />
+        <Stack.Screen name="lembretes" />
         <Stack.Screen name="login" />
         <Stack.Screen name="cadastro" />
         <Stack.Screen name="explore" />
