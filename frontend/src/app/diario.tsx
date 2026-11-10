@@ -27,14 +27,11 @@ const NIVEIS: { valor: ExposicaoSolar; rotulo: string }[] = [
   { valor: 'ALTO', rotulo: 'Alto' },
 ];
 
-// Limite da coluna diario_pele.url_foto (VARCHAR(255)).
-const TAMANHO_MAXIMO_URL_FOTO = 255;
-
 export default function Diario() {
   const [mudancas, setMudancas] = useState('');
   const [sintomas, setSintomas] = useState('');
   const [exposicao, setExposicao] = useState<ExposicaoSolar>('MODERADO');
-  const [foto, setFoto] = useState<string | null>(null);
+  const [foto, setFoto] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
@@ -53,14 +50,7 @@ export default function Diario() {
         return;
       }
 
-      const uri = resultado.assets[0].uri;
-
-      if (uri.length > TAMANHO_MAXIMO_URL_FOTO) {
-        setErro('Não foi possível anexar esta foto. Tente outra imagem.');
-        return;
-      }
-
-      setFoto(uri);
+      setFoto(resultado.assets[0]);
     } catch {
       setErro('Não foi possível abrir a galeria.');
     }
@@ -76,8 +66,7 @@ export default function Diario() {
         mudancas_percebidas: mudancas,
         sintomas,
         exposicao_solar: exposicao,
-        // shortcut: envia a URI local porque o backend não tem upload; a foto só existe neste aparelho, trocar quando houver endpoint de upload.
-        url_foto: foto ?? undefined,
+        foto: foto ?? undefined,
       });
 
       setMudancas('');
@@ -179,7 +168,7 @@ export default function Diario() {
           {foto ? (
             <View style={styles.previa}>
               <Image
-                source={{ uri: foto }}
+                source={{ uri: foto.uri }}
                 style={styles.imagemPrevia}
                 contentFit="cover"
                 accessibilityLabel="Foto selecionada"

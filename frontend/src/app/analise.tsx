@@ -20,7 +20,7 @@ import {
     Text,
     View,
 } from 'react-native';
-import api from '../services/api';
+import api, { urlFoto } from '../services/api';
 import { obterToken } from '../services/authService';
 
 const AZUL = '#2463A6';
@@ -156,7 +156,7 @@ export default function Analise() {
     );
   }
 
-  const foto = lesao.fotos?.[0]?.url_foto;
+  const foto = urlFoto(lesao.fotos?.[0]?.url_foto);
 
   return (
     <SafeAreaView style={styles.container}>
