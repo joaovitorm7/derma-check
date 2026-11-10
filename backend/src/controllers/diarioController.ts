@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { Request, Response } from 'express';
 import { DiarioModel } from '../models/diarioModel';
 
@@ -6,13 +7,14 @@ export class DiarioController {
   static async registrarDiario(req: Request, res: Response): Promise<Response> {
     try {
       const usuarioId = (req as any).usuarioId;
-      const { mudancas_percebidas, sintomas, exposicao_solar, url_foto } = req.body;
+      const { mudancas_percebidas, sintomas, exposicao_solar } = req.body;
 
       // RN04 / CA07: Validação do ENUM de exposição solar
       const niveisValidos = ['BAIXO', 'MODERADO', 'ALTO'];
       const nivelExposicao = exposicao_solar ? String(exposicao_solar).toUpperCase() : 'BAIXO';
 
       if (!niveisValidos.includes(nivelExposicao)) {
+        if (req.file) fs.unlink(req.file.path, () => {});
         return res.status(400).json({
           error: 'Nível de exposição solar inválido. Escolha entre: BAIXO, MODERADO ou ALTO.'
         });
@@ -23,7 +25,7 @@ export class DiarioController {
         mudancas_percebidas: mudancas_percebidas ? mudancas_percebidas.trim() : '',
         sintomas: sintomas ? sintomas.trim() : '',
         exposicao_solar: nivelExposicao as 'BAIXO' | 'MODERADO' | 'ALTO',
-        url_foto: url_foto ? url_foto.trim() : undefined
+        ...(req.file && { url_foto: `/uploads/${req.file.filename}` })
       });
 
       return res.status(201).json({
@@ -31,6 +33,7 @@ export class DiarioController {
         diarioId
       });
     } catch (error) {
+      if (req.file) fs.unlink(req.file.path, () => {});
       console.error('Erro ao registrar diário:', error);
       return res.status(500).json({ error: 'Erro interno ao salvar registro no diário.' });
     }

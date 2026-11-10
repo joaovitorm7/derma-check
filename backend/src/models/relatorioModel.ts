@@ -65,7 +65,7 @@ export class RelatorioModel {
 
     for (const lesao of lesoesRows) {
       const [fotosRows]: any = await pool.query(
-        `SELECT url_foto FROM fotos_lesao WHERE lesao_id = ? ORDER BY enviado_em DESC`,
+        `SELECT url_foto FROM fotos_lesao WHERE lesao_id = ? ORDER BY data_foto DESC`,
         [lesao.id]
       );
 
