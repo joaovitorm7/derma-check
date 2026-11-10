@@ -49,3 +49,5 @@ example
 /android
 frontend/ios
 frontend/android
+# fotos enviadas pelos usuários
+backend/uploads/

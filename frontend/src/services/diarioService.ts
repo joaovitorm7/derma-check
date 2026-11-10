@@ -1,6 +1,8 @@
 import { isAxiosError } from 'axios';
 
-import { api } from './api';
+import type { ImagePickerAsset } from 'expo-image-picker';
+
+import { anexarFoto, api, CABECALHO_UPLOAD } from './api';
 import { obterToken } from './authService';
 
 export type ExposicaoSolar = 'BAIXO' | 'MODERADO' | 'ALTO';
@@ -9,15 +11,20 @@ type NovoRegistroDiario = {
   mudancas_percebidas: string;
   sintomas: string;
   exposicao_solar: ExposicaoSolar;
-  url_foto?: string;
+  foto?: ImagePickerAsset;
 };
 
-export async function registrarDiario(dados: NovoRegistroDiario): Promise<void> {
+export async function registrarDiario({ foto, ...campos }: NovoRegistroDiario): Promise<void> {
   const token = await obterToken();
 
   try {
+    const dados = new FormData();
+    Object.entries(campos).forEach(([chave, valor]) => dados.append(chave, valor));
+    if (foto) anexarFoto(dados, foto);
+
     await api.post('/api/diario', dados, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${token}`, ...CABECALHO_UPLOAD },
+      timeout: 60000,
     });
   } catch (erro) {
     if (isAxiosError(erro) && erro.response) {

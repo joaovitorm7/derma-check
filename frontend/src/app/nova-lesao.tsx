@@ -26,7 +26,7 @@ import {
     TextInput,
     View,
 } from 'react-native';
-import api from '../services/api';
+import api, { anexarFoto, CABECALHO_UPLOAD } from '../services/api';
 import { obterToken } from '../services/authService';
 
 const AZUL = '#2463A6';
@@ -147,14 +147,13 @@ export default function NovaLesao() {
 
       if (foto) {
         try {
-          await api.post(
-            `/api/lesoes/${id}/fotos`,
-            {
-              url_foto: foto.uri,
-              observacao_foto: observacoes.trim(),
-            },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
+          const dados = new FormData();
+          anexarFoto(dados, foto);
+          dados.append('observacao_foto', observacoes.trim());
+          await api.post(`/api/lesoes/${id}/fotos`, dados, {
+            headers: { Authorization: `Bearer ${token}`, ...CABECALHO_UPLOAD },
+            timeout: 60000,
+          });
         } catch {
           setLesaoSalva(true);
           Alert.alert(

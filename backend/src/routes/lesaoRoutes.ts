@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { LesaoController } from '../controllers/lesaoController';
 import { authMiddleware }  from '../middlewares/authMiddleware';
+import { uploadFoto } from '../middlewares/uploadMiddleware';
 
 const router = Router();
 
@@ -10,7 +11,7 @@ router.use(authMiddleware);
 router.post('/', LesaoController.registrarLesao);
 router.get('/', LesaoController.listarLesoes);
 router.get('/:id', LesaoController.obterDetalhesLesao);
-router.post('/:id/fotos', LesaoController.adicionarFoto);
+router.post('/:id/fotos', uploadFoto, LesaoController.adicionarFoto);
 router.get('/:id/analise-demo', LesaoController.obterAnaliseDemonstrativa);
 router.get('/:id/relatorios', LesaoController.obterRelatorios);
 

@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { Request, Response } from 'express';
 import { LesaoModel } from '../models/lesaoModel';
 
@@ -70,25 +71,30 @@ export class LesaoController {
     try {
       const usuarioId = (req as any).usuarioId;
       const lesaoId = Number(req.params.id);
-      const { url_foto, observacao_foto } = req.body;
+      const { observacao_foto } = req.body;
+      const arquivo = req.file;
 
-      if (!url_foto) {
-        return res.status(400).json({ error: 'A URL ou imagem da lesão é obrigatória.' });
+      if (!arquivo) {
+        return res.status(400).json({ error: 'A imagem da lesão é obrigatória.' });
       }
 
       const lesao = await LesaoModel.buscarPorIdEUsuario(lesaoId, usuarioId);
       if (!lesao) {
+        fs.unlink(arquivo.path, () => {});
         return res.status(404).json({ error: 'Lesão não encontrada.' });
       }
 
+      const url_foto = `/uploads/${arquivo.filename}`;
       const fotoId = await LesaoModel.adicionarFoto({
         lesao_id: lesaoId,
         url_foto,
         observacao_foto
       });
 
-      return res.status(201).json({ message: 'Fotografia adicionada com sucesso.', fotoId });
+      return res.status(201).json({ message: 'Fotografia adicionada com sucesso.', fotoId, url_foto });
     } catch (error) {
+      if (req.file) fs.unlink(req.file.path, () => {});
+      console.error('Erro ao adicionar fotografia:', error);
       return res.status(500).json({ error: 'Erro interno ao adicionar fotografia.' });
     }
   }
