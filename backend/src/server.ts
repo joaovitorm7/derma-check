@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import multer from 'multer';
 import { PASTA_UPLOADS } from './middlewares/uploadMiddleware';
 import authRoutes from './routes/authRoutes';
 import lesaoRoutes from './routes/lesaoRoutes';
@@ -38,7 +37,7 @@ app.get('/health', (req, res) => {
 
 // Erros do upload (arquivo grande ou tipo inválido) viram 400 em vez de 500.
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  if (err instanceof multer.MulterError) {
+  if (err?.name === 'MulterError' || typeof err?.code === 'string') {
     const mensagem = err.code === 'LIMIT_FILE_SIZE'
       ? 'A imagem deve ter no máximo 10 MB.'
       : 'Envie uma imagem JPG, PNG, WEBP ou HEIC no campo "foto".';
