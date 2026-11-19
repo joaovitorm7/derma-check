@@ -16,7 +16,7 @@ const ITENS = [
   { titulo: 'Perfil', Icone: UserRound, destino: '/perfil' as Href },
 ];
 
-export function BarraNavegacao({ ativo }: { ativo: 'Início' | 'Diário' }) {
+export function BarraNavegacao({ ativo }: { ativo: 'Início' | 'Histórico' | 'Diário' | 'Mensagens' | 'Perfil' }) {
   return (
     <View style={styles.navegacao}>
       {ITENS.map(({ titulo, Icone, destino }) => {

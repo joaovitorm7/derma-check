@@ -74,8 +74,22 @@ derma-check/
 ## Configuração do banco de dados (MySQL)
 
 1. **Inicie o MySQL.** Confirme que ele está ouvindo na porta `3306`. O banco precisa estar disponível na mesma máquina do backend.
-2. **Crie o banco e as tabelas.** No MySQL Workbench, abra `backend/database/schema.sql` e execute o script. Ele cria o banco `derma_check` e a tabela `usuarios`. O script pode ser executado novamente sem apagar registros existentes.
-3. **Crie o arquivo de ambiente do backend** (PowerShell):
+2. **Crie o banco e as tabelas.** No MySQL Workbench, abra `backend/database/schema.sql` e execute o script. Ele cria o banco `derma_check` e suas tabelas.
+
+   > ⚠️ O script apaga e recria as tabelas `diario_pele`, `fotos_lesao`, `lesoes` e `usuarios`. Execute-o apenas na primeira configuração ou se puder perder todos os dados dessas tabelas.
+
+3. **Crie um usuário próprio para a API** no MySQL Workbench, usando uma senha local escolhida por você:
+
+   ```sql
+   CREATE USER IF NOT EXISTS 'derma_app'@'localhost'
+     IDENTIFIED BY 'escolha-uma-senha-local';
+   GRANT ALL PRIVILEGES ON derma_check.* TO 'derma_app'@'localhost';
+   FLUSH PRIVILEGES;
+   ```
+
+   Se o usuário já existir e precisar atualizar a senha, use `ALTER USER` no lugar de `CREATE USER`.
+
+4. **Crie o arquivo de ambiente do backend** (PowerShell):
 
    ```powershell
    Copy-Item backend\.env.example backend\.env
@@ -87,7 +101,7 @@ derma-check/
    cp backend/.env.example backend/.env
    ```
 
-4. **Edite `backend/.env`** com as credenciais da sua instalação (veja a tabela abaixo). Troque o `JWT_SECRET` por um segredo longo e aleatório.
+5. **Edite `backend/.env`** com a mesma senha escolhida para `derma_app` e um `JWT_SECRET` longo, aleatório e exclusivo (veja a tabela abaixo).
 
 > 🔒 Nunca compartilhe nem versione o arquivo `.env`.
 
