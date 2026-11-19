@@ -1,18 +1,25 @@
+import fs from 'fs';
+import path from 'path';
 import { Request, Response } from 'express';
 import { LembreteModel } from '../models/lembreteModel';
+import { PASTA_UPLOADS } from '../middlewares/uploadMiddleware';
 
 export class LembreteController {
-  // RN02, RN03, RN04, RN05, RN06, RN08: Criar lembrete com validações
+  // RN02, RN03, RN04, RN05, RN06, RN08: Criar lembrete com validações e foto opcional
   static async criarLembrete(req: Request, res: Response): Promise<Response> {
+    const arquivo = req.file;
+
     try {
       const usuarioId = (req as any).usuarioId;
       const { titulo, tipo, data_lembrete, observacoes } = req.body;
 
       if (!titulo || !titulo.trim()) {
+        if (arquivo) fs.unlink(arquivo.path, () => {});
         return res.status(400).json({ error: 'O título do lembrete é obrigatório.' });
       }
 
       if (!data_lembrete) {
+        if (arquivo) fs.unlink(arquivo.path, () => {});
         return res.status(400).json({ error: 'A data do lembrete é obrigatória.' });
       }
 
@@ -20,20 +27,25 @@ export class LembreteController {
       const tiposValidos = ['FOTO', 'DIARIO', 'CONSULTA', 'OUTRO'];
       const tipoFinal = tipo && tiposValidos.includes(tipo.toUpperCase()) ? tipo.toUpperCase() : 'OUTRO';
 
+      const url_foto = arquivo ? `/uploads/${arquivo.filename}` : (req.body.url_foto || null);
+
       const lembreteId = await LembreteModel.criar({
         usuario_id: usuarioId,
         titulo: titulo.trim(),
         tipo: tipoFinal,
         data_lembrete,
-        observacoes: observacoes ? observacoes.trim() : ''
+        observacoes: observacoes ? observacoes.trim() : '',
+        url_foto
       });
 
       return res.status(201).json({
         message: 'Lembrete criado com sucesso.',
         lembreteId,
+        url_foto,
         aviso_notificacoes: 'O sistema está em modo demonstrativo. As notificações push não serão enviadas nesta versão.' // RN08
       });
     } catch (error) {
+      if (arquivo) fs.unlink(arquivo.path, () => {});
       console.error('Erro ao criar lembrete:', error);
       return res.status(500).json({ error: 'Erro interno ao salvar lembrete.' });
     }
@@ -76,16 +88,25 @@ export class LembreteController {
     }
   }
 
-  // Excluir um lembrete
+  // Excluir um lembrete (e remover fotografia vinculada, se houver)
   static async deletarLembrete(req: Request, res: Response): Promise<Response> {
     try {
       const usuarioId = (req as any).usuarioId;
       const lembreteId = Number(req.params.id);
 
-      const deletado = await LembreteModel.deletar(lembreteId, usuarioId);
+      const lembrete = await LembreteModel.buscarPorIdEUsuario(lembreteId, usuarioId);
+      if (!lembrete) {
+        return res.status(404).json({ error: 'Lembrete não encontrado ou acesso negado.' });
+      }
 
+      const deletado = await LembreteModel.deletar(lembreteId, usuarioId);
       if (!deletado) {
         return res.status(404).json({ error: 'Lembrete não encontrado ou acesso negado.' });
+      }
+
+      if (lembrete.url_foto) {
+        const caminhoArquivo = path.join(PASTA_UPLOADS, path.basename(lembrete.url_foto));
+        fs.unlink(caminhoArquivo, () => {});
       }
 
       return res.status(200).json({ message: 'Lembrete excluído com sucesso.' });

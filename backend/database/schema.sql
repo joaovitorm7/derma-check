@@ -7,6 +7,7 @@ USE derma_check;
 -- Desativa checagem de chaves para permitir recriação limpa
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS lembretes;
 DROP TABLE IF EXISTS diario_pele;
 DROP TABLE IF EXISTS fotos_lesao;
 DROP TABLE IF EXISTS lesoes;
@@ -80,14 +81,15 @@ CREATE TABLE diario_pele (
   DEFAULT CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
--- 5. Tabela de Lembretes (CA01 a CA07, RN08)
-CREATE TABLE IF NOT EXISTS lembretes (
+-- 5. Tabela de Lembretes (RN01 a RN10)
+CREATE TABLE lembretes (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   usuario_id INT UNSIGNED NOT NULL,
   titulo VARCHAR(150) NOT NULL,
   tipo ENUM('FOTO', 'DIARIO', 'CONSULTA', 'OUTRO') NOT NULL DEFAULT 'OUTRO',
   data_lembrete DATETIME NOT NULL,
   observacoes TEXT NULL,
+  url_foto VARCHAR(255) NULL,
   concluido TINYINT(1) NOT NULL DEFAULT 0,
   criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
