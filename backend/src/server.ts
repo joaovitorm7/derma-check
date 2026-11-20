@@ -8,6 +8,7 @@ import lesaoRoutes from './routes/lesaoRoutes';
 import diarioRoutes from './routes/diarioRoutes';
 import lembreteRoutes from './routes/lembreteRoutes';
 import relatorioRoutes from './routes/relatorioRoutes';
+import usuarioRoutes from './routes/usuarioRoutes';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use('/api/lesoes', lesaoRoutes);
 app.use('/api/diario', diarioRoutes);
 app.use('/api/lembretes', lembreteRoutes);
 app.use('/api/relatorios', relatorioRoutes);
+app.use('/api/usuarios', usuarioRoutes);
 
 app.use('/uploads', express.static(PASTA_UPLOADS));
 
