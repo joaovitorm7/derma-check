@@ -50,6 +50,36 @@ export class LesaoModel {
     return rows.length > 0 ? rows[0] : null;
   }
 
+  // Atualizar dados de uma lesão pertencente ao usuário
+  static async atualizarLesao(
+    lesaoId: number,
+    usuarioId: number,
+    dados: { nome_identificacao: string; localizacao_corpo: string; observacoes?: string }
+  ): Promise<boolean> {
+    const [result]: any = await pool.query(
+      `UPDATE lesoes
+       SET nome_identificacao = ?, localizacao_corpo = ?, observacoes = ?
+       WHERE id = ? AND usuario_id = ?`,
+      [
+        dados.nome_identificacao,
+        dados.localizacao_corpo,
+        dados.observacoes || null,
+        lesaoId,
+        usuarioId
+      ]
+    );
+    return result.affectedRows > 0;
+  }
+
+  // Excluir uma lesão pertencente ao usuário (as fotos no banco são removidas via ON DELETE CASCADE)
+  static async deletarLesao(lesaoId: number, usuarioId: number): Promise<boolean> {
+    const [result]: any = await pool.query(
+      `DELETE FROM lesoes WHERE id = ? AND usuario_id = ?`,
+      [lesaoId, usuarioId]
+    );
+    return result.affectedRows > 0;
+  }
+
   // RN02: Adicionar foto vinculada à lesão
   static async adicionarFoto(foto: IFotoLesao): Promise<number> {
     const [result]: any = await pool.query(
