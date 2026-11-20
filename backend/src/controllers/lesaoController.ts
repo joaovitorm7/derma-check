@@ -1,6 +1,8 @@
 import fs from 'fs';
+import path from 'path';
 import { Request, Response } from 'express';
 import { LesaoModel } from '../models/lesaoModel';
+import { PASTA_UPLOADS } from '../middlewares/uploadMiddleware';
 
 export class LesaoController {
   // RN01, RN03 & RN04 (CA01, CA03, CA04) - Registrar Lesão
@@ -63,6 +65,84 @@ export class LesaoController {
       return res.status(200).json({ ...lesao, fotos });
     } catch (error) {
       return res.status(500).json({ error: 'Erro interno ao obter detalhes da lesão.' });
+    }
+  }
+
+  // Editar Lesão
+  static async editarLesao(req: Request, res: Response): Promise<Response> {
+    try {
+      const usuarioId = (req as any).usuarioId;
+      const lesaoId = Number(req.params.id);
+      const { nome_identificacao, localizacao_corpo, observacoes } = req.body;
+
+      if (Number.isNaN(lesaoId)) {
+        return res.status(400).json({ error: 'ID da lesão inválido.' });
+      }
+
+      if (!nome_identificacao || !nome_identificacao.trim()) {
+        return res.status(400).json({ error: 'O nome ou identificação da lesão é obrigatório.' });
+      }
+
+      if (!localizacao_corpo || !localizacao_corpo.trim()) {
+        return res.status(400).json({ error: 'A localização no corpo é obrigatória.' });
+      }
+
+      const atualizado = await LesaoModel.atualizarLesao(lesaoId, usuarioId, {
+        nome_identificacao: nome_identificacao.trim(),
+        localizacao_corpo: localizacao_corpo.trim(),
+        observacoes: observacoes ? observacoes.trim() : ''
+      });
+
+      if (!atualizado) {
+        return res.status(404).json({ error: 'Lesão não encontrada ou acesso negado.' });
+      }
+
+      const lesaoAtualizada = await LesaoModel.buscarPorIdEUsuario(lesaoId, usuarioId);
+
+      return res.status(200).json({
+        message: 'Lesão atualizada com sucesso.',
+        lesao: lesaoAtualizada
+      });
+    } catch (error) {
+      console.error('Erro ao editar lesão:', error);
+      return res.status(500).json({ error: 'Erro interno ao editar lesão.' });
+    }
+  }
+
+  // Excluir Lesão (e remover fotografias físicas vinculadas)
+  static async excluirLesao(req: Request, res: Response): Promise<Response> {
+    try {
+      const usuarioId = (req as any).usuarioId;
+      const lesaoId = Number(req.params.id);
+
+      if (Number.isNaN(lesaoId)) {
+        return res.status(400).json({ error: 'ID da lesão inválido.' });
+      }
+
+      const lesao = await LesaoModel.buscarPorIdEUsuario(lesaoId, usuarioId);
+      if (!lesao) {
+        return res.status(404).json({ error: 'Lesão não encontrada ou acesso negado.' });
+      }
+
+      // Busca as fotos antes de excluir a lesão para limpar os arquivos do disco
+      const fotos = await LesaoModel.buscarFotosPorLesao(lesaoId);
+
+      const deletado = await LesaoModel.deletarLesao(lesaoId, usuarioId);
+      if (!deletado) {
+        return res.status(404).json({ error: 'Lesão não encontrada ou acesso negado.' });
+      }
+
+      for (const foto of fotos) {
+        if (foto.url_foto) {
+          const caminhoArquivo = path.join(PASTA_UPLOADS, path.basename(foto.url_foto));
+          fs.unlink(caminhoArquivo, () => {});
+        }
+      }
+
+      return res.status(200).json({ message: 'Lesão excluída com sucesso.' });
+    } catch (error) {
+      console.error('Erro ao excluir lesão:', error);
+      return res.status(500).json({ error: 'Erro interno ao excluir lesão.' });
     }
   }
 
