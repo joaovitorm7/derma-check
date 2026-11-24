@@ -1,7 +1,4 @@
-import { isAxiosError } from 'axios';
-
-import { api } from './api';
-import { obterToken } from './authService';
+import { api, chamar } from './api';
 
 export type TipoLembrete = 'FOTO' | 'DIARIO' | 'CONSULTA' | 'OUTRO';
 
@@ -20,21 +17,6 @@ type NovoLembrete = {
   data_lembrete: string;
   observacoes?: string;
 };
-
-async function chamar<T>(requisicao: (headers: { Authorization: string }) => Promise<{ data: T }>): Promise<T> {
-  const token = await obterToken();
-
-  try {
-    const { data } = await requisicao({ Authorization: `Bearer ${token}` });
-    return data;
-  } catch (erro) {
-    if (isAxiosError(erro) && erro.response) {
-      throw new Error(erro.response.data?.error || 'Não foi possível concluir a operação.');
-    }
-
-    throw new Error('Não foi possível conectar ao servidor. Verifique a rede e se o backend está ativo.');
-  }
-}
 
 export function listarLembretes() {
   return chamar<{ lembretes: Lembrete[]; aviso_notificacoes: string }>((headers) =>

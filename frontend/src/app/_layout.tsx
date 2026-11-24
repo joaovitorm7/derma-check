@@ -21,6 +21,7 @@ export default function RootLayout() {
         <Stack.Screen name="esqueci-senha" />
         <Stack.Screen name="mensagens" />
         <Stack.Screen name="perfil" />
+        <Stack.Screen name="configuracoes" />
       </Stack>
     </ThemeProvider>
   );
